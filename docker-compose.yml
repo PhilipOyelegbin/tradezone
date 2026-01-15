@@ -1,0 +1,26 @@
+services:
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: postgres_local
+    environment:
+      POSTGRES_DB: tradezone_db
+      POSTGRES_USER: tradezone_user
+      POSTGRES_PASSWORD: K7q9ZyrFEi6rNrl
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  redis_cache:
+    image: redis:latest
+    container_name: redis_local
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+
+volumes:
+  postgres_data:
+  redis_data:
