@@ -1,0 +1,82 @@
+/* Import Inter font from Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+@tailwind utilities;
+
+/* Global styles */
+
+/* 
+text-orange-600 ~ Phoenix default
+text-orange-500 ~ Phoenix light
+bg-orange-600 → Phoenix background
+hover:bg-orange-700 → hover effect 
+
+text-[#E25822] → Phoenix default color
+bg-[#E25822] → Phoenix background
+hover:bg-[#B84016] → darker hover
+text-[#FF7A45] → Phoenix light (for dark mode if needed)
+*/
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply transition-colors duration-300 ease-in-out scroll-smooth box-border;
+  }
+
+  body {
+    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans min-h-screen text-base;
+    line-height: 1.6;
+    font-family: "Inter", sans-serif;
+  }
+
+  button {
+    @apply cursor-pointer transition duration-200 ease-in-out;
+  }
+
+  input,
+  textarea,
+  select {
+    @apply border border-gray-300 dark:border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#E25822] focus:border-[#E25822] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold text-gray-900 dark:text-gray-100;
+  }
+
+  img {
+    @apply max-w-full h-auto rounded-lg;
+  }
+}
+
+@layer components {
+  .container {
+    @apply mx-auto px-6;
+  }
+
+  .link {
+    @apply text-[#E25822] hover:underline;
+  }
+
+  .dark-link {
+    @apply text-[#FF7A45];
+  }
+
+  .shadow-card {
+    @apply shadow-lg hover:shadow-xl transition-shadow duration-300;
+  }
+
+  .transition-all {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .dark button {
+    @apply bg-[#B84016] text-white;
+  }
+}

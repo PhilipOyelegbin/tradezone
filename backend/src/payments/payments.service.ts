@@ -4,12 +4,12 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { BaseLogger } from 'src/_config';
+import { BaseLogger } from '../_config';
 import { CreatePaymentDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Payment } from './entities/payment.entity';
 import { Repository } from 'typeorm';
-import { Order } from 'src/orders/entities/order.entity';
+import { Order } from '../orders/entities/order.entity';
 
 @Injectable()
 export class PaymentsService extends BaseLogger {
@@ -53,7 +53,7 @@ export class PaymentsService extends BaseLogger {
           metadata: {
             orderId: existingOrder.id,
             userId: existingOrder.user.id,
-            cancel_action: 'https://your-cancel-url.com',
+            cancel_action: process.env.CLIENT_URL,
           },
         }),
       },

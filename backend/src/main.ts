@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -11,8 +12,7 @@ async function bootstrap() {
       origin: [
         'http://localhost:3000',
         'http://localhost:5173',
-        'http://localhost:3030',
-        'https://philipoyelegbin.com.ng',
+        'https://tradezone.netlify.app',
       ],
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       preflightContinue: false,
@@ -22,6 +22,29 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.use(
+    helmet({
+      crossOriginEmbedderPolicy: false,
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          imgSrc: [
+            `'self'`,
+            'data:',
+            'apollo-server-landing-page.cdn.apollographql.com',
+          ],
+          scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
+          manifestSrc: [
+            `'self'`,
+            'apollo-server-landing-page.cdn.apollographql.com',
+          ],
+          frameSrc: [`'self'`, 'sandbox.embed.apollographql.com'],
+          objectSrc: ["'none'"],
+          baseUri: ["'none'"],
+        },
+      },
+    }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Tradezone API')
@@ -59,9 +82,9 @@ async function bootstrap() {
     ],
   });
 
-  await app.listen(process.env.PORT ?? 4000);
+  await app.listen(process.env.PORT ?? 4001);
   console.log(
-    `Application is running on http://localhost:${process.env.PORT ?? 4000}`,
+    `Application is running on http://localhost:${process.env.PORT ?? 4001}`,
   );
 }
 bootstrap();

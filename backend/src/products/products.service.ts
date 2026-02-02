@@ -3,8 +3,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
-import { Storage } from 'src/_helper';
-import { BaseLogger } from 'src/_config';
+import { Storage } from '../_helper';
+import { BaseLogger } from '../_config';
 
 @Injectable()
 export class ProductsService extends BaseLogger {

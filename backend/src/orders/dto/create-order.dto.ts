@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { CreateCartDto } from '../../cart/dto';
 
 export class CreateOrderDto {
   @ApiProperty({
@@ -11,10 +12,13 @@ export class CreateOrderDto {
   shipping_address: string;
 
   @ApiProperty({
-    example: 'ab0dd9b1-ec74-49a6-9423-4883c9e892ac',
-    description: 'UUID of the cart associated with the order',
+    example: [
+      { product_id: 'uuid-of-cart-1234', quantity: 2 },
+      { product_id: 'uuid-of-cart-5678', quantity: 1 },
+    ],
+    description: 'Array of carts associated with the order',
   })
-  @IsString()
+  @IsArray()
   @IsNotEmpty()
-  cart_id: string;
+  carts: CreateCartDto[];
 }

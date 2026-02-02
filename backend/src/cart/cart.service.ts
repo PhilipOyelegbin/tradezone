@@ -7,7 +7,7 @@ import {
 import { Cart } from './entities/cart.entity';
 import { Repository } from 'typeorm';
 import { CreateCartDto, UpdateCartDto } from './dto';
-import { BaseLogger } from 'src/_config';
+import { BaseLogger } from '../_config';
 
 @Injectable()
 export class CartService extends BaseLogger {

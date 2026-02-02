@@ -10,8 +10,8 @@ import { MoreThan, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
 import { User } from './entities/user.entity';
-import { Mailer, Token } from 'src/_helper';
-import { BaseLogger } from 'src/_config';
+import { Mailer, Token } from '../_helper';
+import { BaseLogger } from '../_config';
 
 @Injectable()
 export class UsersService extends BaseLogger {

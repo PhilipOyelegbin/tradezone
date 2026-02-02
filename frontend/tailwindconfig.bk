@@ -1,0 +1,19 @@
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  theme: {
+    extend: {
+      colors: {
+        phoenix: {
+          DEFAULT: "#E25822",
+          dark: "#B84016",
+          light: "#FF7A45",
+        },
+      },
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+      },
+    },
+  },
+  plugins: [],
+};

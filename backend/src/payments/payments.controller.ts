@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto';
-import { BaseLogger, JwtGuard } from 'src/_config';
+import { BaseLogger, JwtGuard } from '../_config';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,

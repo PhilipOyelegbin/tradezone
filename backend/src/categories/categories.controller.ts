@@ -26,7 +26,7 @@ import {
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { BaseLogger, JwtGuard } from 'src/_config';
+import { BaseLogger, JwtGuard } from '../_config';
 
 @Controller('categories')
 export class CategoriesController extends BaseLogger {

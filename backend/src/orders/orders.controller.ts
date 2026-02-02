@@ -15,7 +15,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { BaseLogger, JwtGuard } from 'src/_config';
+import { BaseLogger, JwtGuard } from '../_config';
 import { CreateOrderDto, UpdateOrderDto } from './dto';
 import {
   ApiAcceptedResponse,

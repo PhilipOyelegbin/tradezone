@@ -33,7 +33,7 @@ import {
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { BaseLogger, JwtGuard } from 'src/_config';
+import { BaseLogger, JwtGuard } from '../_config';
 
 @ApiInternalServerErrorResponse({ description: 'Internal server error' })
 @Controller('users')
@@ -125,7 +125,7 @@ export class UsersController extends BaseLogger {
   @ApiBearerAuth()
   @UseGuards(JwtGuard)
   @Get()
-  findAll(@Req() req) {
+  findAll(@Req() req: any) {
     if (!req?.user.is_admin) {
       this.logger.warn('Forbidden access attempt to all users data');
       throw new ForbiddenException('Access to resource denied');
@@ -144,7 +144,13 @@ export class UsersController extends BaseLogger {
   @ApiBearerAuth()
   @UseGuards(JwtGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Req() req: any, @Param('id') id: string) {
+    if (req.user.id !== id) {
+      this.logger.warn(
+        `Forbidden access attempt to user data: ${id} by user: ${req.user.id}`,
+      );
+      throw new ForbiddenException('Access to resource denied');
+    }
     if (!id) {
       this.logger.warn('Missing user id for fetching user data');
       throw new BadRequestException('User ID is required');
@@ -162,7 +168,13 @@ export class UsersController extends BaseLogger {
   @UseGuards(JwtGuard)
   @Put(':id')
   @HttpCode(HttpStatus.ACCEPTED)
-  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
+  update(@Req() req: any, @Param('id') id: string, @Body() dto: UpdateUserDto) {
+    if (req.user.id !== id) {
+      this.logger.warn(
+        `Forbidden access attempt to update user data: ${id} by user: ${req.user.id}`,
+      );
+      throw new ForbiddenException('Access to resource denied');
+    }
     if (!id) {
       this.logger.warn('Missing user id for updating user data');
       throw new BadRequestException('User ID is required');
@@ -183,7 +195,13 @@ export class UsersController extends BaseLogger {
   @UseGuards(JwtGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
+  remove(@Req() req: any, @Param('id') id: string) {
+    if (req.user.id !== id) {
+      this.logger.warn(
+        `Forbidden access attempt to delete user data: ${id} by user: ${req.user.id}`,
+      );
+      throw new ForbiddenException('Access to resource denied');
+    }
     if (!id) {
       this.logger.warn('Missing user id for deleting user data');
       throw new BadRequestException('User ID is required');

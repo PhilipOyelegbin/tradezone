@@ -5,7 +5,7 @@ export class CreatePaymentDto {
   @ApiProperty({
     example: 'card',
     description:
-      'The payment method must be either card, bank, apple_pay, ussd, or qr',
+      'The payment method must be either card, bank_transfer, apple_pay, ussd, or qr',
   })
   @IsNotEmpty()
   @IsEnum(['card', 'bank_transfer', 'apple_pay', 'ussd', 'qr'])

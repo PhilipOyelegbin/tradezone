@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto, UpdateCartDto } from './dto';
-import { BaseLogger, JwtGuard } from 'src/_config';
+import { BaseLogger, JwtGuard } from '../_config';
 import {
   ApiAcceptedResponse,
   ApiBadRequestResponse,

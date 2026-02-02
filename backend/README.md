@@ -21,7 +21,7 @@ The API will serve as the backend engine for a digital storefront and facilitate
 
 - Env variable: @nestjs/config
 - Hashing: argon2
-- Security: csrf-csrf
+- Security: helmet, cors
 - Documentation: @nestjs/swagger
 - Database: typeorm, pg, reflect-metadata
 - Validator: class-validator, class-transformer

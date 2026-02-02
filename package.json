@@ -3,12 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "workspaces": [
-    "backend/*",
-    "frontend/*"
-  ],
   "scripts": {
     "proxy": "pnpm lt --port 3001",
+    "dev": "pnpm -r dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

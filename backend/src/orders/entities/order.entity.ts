@@ -1,5 +1,4 @@
-import { Cart } from 'src/cart/entities/cart.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import {
   Column,
   Entity,
@@ -7,6 +6,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
+interface CartItem {
+  product_id: string;
+  quantity: number;
+}
 
 @Entity()
 export class Order {
@@ -29,9 +33,8 @@ export class Order {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Cart, { eager: true })
-  @JoinColumn({ name: 'cart_id' })
-  cart: Cart;
+  @Column({ type: 'jsonb', nullable: false, default: [] })
+  carts: CartItem[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;

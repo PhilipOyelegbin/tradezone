@@ -7,7 +7,7 @@ import {
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
 import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
-import { BaseLogger } from 'src/_config';
+import { BaseLogger } from '../_config';
 
 @Injectable()
 export class CategoriesService extends BaseLogger {

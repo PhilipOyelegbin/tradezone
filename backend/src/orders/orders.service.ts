@@ -3,61 +3,77 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { BaseLogger } from 'src/_config';
+import { BaseLogger } from '../_config';
 import { CreateOrderDto, UpdateOrderDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
-import { Repository, MoreThan } from 'typeorm';
-import { Cart } from 'src/cart/entities/cart.entity';
-import { Product } from 'src/products/entities/product.entity';
+import { DataSource, Repository } from 'typeorm';
+import { Product } from '../products/entities/product.entity';
+import { Cart } from '../cart/entities/cart.entity';
 
 @Injectable()
 export class OrdersService extends BaseLogger {
   constructor(
     @InjectRepository(Order) private readonly orderRepo: Repository<Order>,
-    @InjectRepository(Cart) private readonly cartRepo: Repository<Cart>,
-    @InjectRepository(Product)
-    private readonly productRepo: Repository<Product>,
+    private dataSource: DataSource,
   ) {
     super(OrdersService.name);
   }
 
   async create(userId: string, dto: CreateOrderDto) {
-    const existingCart = await this.cartRepo.findOne({
-      where: { id: dto.cart_id },
-      relations: ['product', 'user'],
-    });
-    if (!existingCart) {
-      this.logger.warn(`Cart with ID ${dto.cart_id} not found for order`);
-      throw new NotFoundException('Cart not found');
-    }
+    return await this.dataSource.transaction(async (manager) => {
+      let totalPrice = 0;
+      for (const cartItem of dto.carts) {
+        const productId = cartItem?.product_id;
+        const quantityToReduce = cartItem.quantity;
 
-    const verifyProduct = await this.productRepo.findOne({
-      where: {
-        id: existingCart.product.id,
-        quantity: MoreThan(existingCart.quantity),
-      },
-    });
-    if (!verifyProduct) {
-      this.logger.warn('Insufficient stock for order');
-      throw new NotFoundException('Insufficient stock for order');
-    }
+        const productInDb = await manager.findOne(Product, {
+          where: { id: productId },
+          select: ['id', 'quantity', 'price'],
+          lock: { mode: 'pessimistic_write' },
+        });
 
-    const newOrder = this.orderRepo.create({
-      ...dto,
-      user: { id: userId },
-      cart: { id: dto.cart_id },
-      payment_info: {
-        provider: 'Paystack',
-        amount: existingCart.quantity * verifyProduct.price,
-      },
+        if (!productInDb) {
+          this.logger.warn(`Product with ID ${productId} not found`);
+          throw new BadRequestException(
+            `Product with ID ${productId} not found.`,
+          );
+        }
+
+        if (productInDb.quantity < quantityToReduce) {
+          this.logger.warn(`Insufficient stock for product ${productId}`);
+          throw new BadRequestException(
+            `Insufficient stock for product ${productId}. Available: ${productInDb.quantity}`,
+          );
+        }
+
+        await manager.decrement(
+          Product,
+          { id: productId },
+          'quantity',
+          quantityToReduce,
+        );
+
+        const price = productInDb.price * quantityToReduce;
+        totalPrice += price;
+        await manager.delete(Cart, { product: { id: cartItem.product_id } });
+      }
+
+      const newOrder = manager.create(Order, {
+        ...dto,
+        user: { id: userId },
+        payment_info: {
+          provider: 'Paystack',
+          amount: totalPrice,
+        },
+      });
+      const savedOrder = await manager.save(newOrder);
+
+      return {
+        message: 'Order created successfully',
+        data: savedOrder,
+      };
     });
-    const order = this.orderRepo.save(newOrder);
-    const deductQuantity = this.productRepo.update(verifyProduct.id, {
-      quantity: verifyProduct.quantity - existingCart.quantity,
-    });
-    const response = await Promise.all([order, deductQuantity]);
-    return { message: 'Order created successfully', data: response };
   }
 
   async findAll(userId: string) {
@@ -96,40 +112,45 @@ export class OrdersService extends BaseLogger {
   }
 
   async remove(id: string, userId: string) {
-    const order = await this.orderRepo.findOne({
-      where: { id, user: { id: userId } },
-      relations: ['cart', 'cart.product'],
-    });
-    if (!order) {
-      this.logger.warn(`Order with ID ${id} not found for user ${userId}`);
-      throw new NotFoundException('Order not found');
-    }
-
-    if (
-      order.status.includes('Shipped') ||
-      order.status.includes('Delivered')
-    ) {
-      this.logger.warn(`Order with ID ${id} cannot be cancelled`);
-      throw new BadRequestException('Order cannot be cancelled.');
-    }
-
-    if (order.status.includes('Cancelled')) {
-      this.logger.warn(`Order with ID ${id} is already cancelled`);
-      throw new BadRequestException('Order is already cancelled.');
-    }
-
-    const removeOrder = this.orderRepo.remove(order);
-    const restockProduct = this.productRepo
-      .findOneBy({ id: order.cart.product.id })
-      .then((product) => {
-        if (product) {
-          return this.productRepo.update(product.id, {
-            quantity: product.quantity + order.cart.quantity,
-          });
-        }
+    return await this.dataSource.transaction(async (manager) => {
+      const order = await manager.findOne(Order, {
+        where: { id, user: { id: userId } },
       });
+      if (!order) {
+        this.logger.warn(`Order with ID ${id} not found for user ${userId}`);
+        throw new NotFoundException('Order not found');
+      }
 
-    await Promise.all([removeOrder, restockProduct]);
-    return { message: 'Order removed successfully' };
+      const status = Array.isArray(order.status)
+        ? order.status[0]
+        : order.status;
+
+      if (['Shipped', 'Delivered'].includes(status)) {
+        this.logger.warn(
+          `Order with ID ${id} cannot be cancelled as it is already ${status}`,
+        );
+        throw new BadRequestException(
+          'Order cannot be cancelled as it is already shipped/delivered.',
+        );
+      }
+
+      if (status === 'Cancelled') {
+        this.logger.warn(`Order with ID ${id} is already cancelled`);
+        throw new BadRequestException('Order is already cancelled.');
+      }
+
+      for (const item of order.carts) {
+        const productId = item?.product_id;
+        await manager.increment(
+          Product,
+          { id: productId },
+          'quantity',
+          item.quantity,
+        );
+      }
+
+      await manager.remove(order);
+      return { message: 'Order cancelled and stock restocked successfully' };
+    });
   }
 }

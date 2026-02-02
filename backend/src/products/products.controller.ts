@@ -34,11 +34,15 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
+  ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { BaseLogger, JwtGuard } from 'src/_config';
+import { BaseLogger, JwtGuard } from '../_config';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
+@ApiTooManyRequestsResponse({ description: 'Too Many Requests' })
 @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
+@UseInterceptors(CacheInterceptor)
 @Controller('products')
 export class ProductsController extends BaseLogger {
   constructor(private readonly productsService: ProductsService) {

@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { ServerClient } from 'postmark';
-import { BaseLogger } from 'src/_config';
+import { BaseLogger } from '../_config';
 
 export class Mailer extends BaseLogger {
   private mailClient: ServerClient;
