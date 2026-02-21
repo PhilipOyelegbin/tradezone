@@ -51,9 +51,9 @@ export default function AppRoutes() {
         }
       />
       <Route
-        path="/admin"
+        path="/host"
         element={
-          <ProtectedRoute admin>
+          <ProtectedRoute admin={true}>
             <Admin />
           </ProtectedRoute>
         }

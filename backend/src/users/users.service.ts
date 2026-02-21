@@ -155,6 +155,8 @@ export class UsersService extends BaseLogger {
         email: true,
         address: true,
         phone_number: true,
+        is_admin: true,
+        is_verified: true,
       },
     });
     if (existingUsers.length === 0) {

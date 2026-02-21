@@ -16,11 +16,15 @@ const ProtectedRoute: React.FC<Props> = ({ children, admin }) => {
 
   try {
     const tokenData = jwtDecode<{ sub: string; role: string }>(token);
+    sessionStorage.setItem("userId", tokenData?.sub || "");
+
     if (admin && tokenData?.role !== "admin") {
-      return <Navigate to="/" replace />;
+      return <Navigate to="/profile" replace />;
     }
 
-    sessionStorage.setItem("userId", tokenData?.sub || "");
+    if (!admin && tokenData?.role === "admin") {
+      return <Navigate to="/host" replace />;
+    }
     return children;
   } catch (error) {
     return <Navigate to="/account" replace />;

@@ -15,6 +15,7 @@ import {
 
 interface UserState {
   user: User | null;
+  users: User[];
   token: string | null;
   loading: boolean;
   success: string | null;
@@ -37,6 +38,7 @@ interface UserState {
 
 export const useUserStore = create<UserState>((set) => ({
   user: null,
+  users: [],
   token: null,
   loading: false,
   success: null,
@@ -87,7 +89,7 @@ export const useUserStore = create<UserState>((set) => ({
       set({ loading: true, error: null });
       try {
         const data = await fetchAllUsers();
-        set({ user: data.data, success: data.message, loading: false });
+        set({ users: data.data, success: data.message, loading: false });
       } catch (err) {
         set({ error: err.request?.statusText || err.message, loading: false });
       }

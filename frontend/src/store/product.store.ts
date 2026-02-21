@@ -12,6 +12,8 @@ import type { Product } from "../utils/interface";
 interface ProductState {
   products: Product[];
   currentProduct: Product | null;
+  totalPages: number;
+  currentPage: number;
   loading: boolean;
   success: string | null;
   error: string | null;
@@ -33,6 +35,8 @@ interface ProductState {
 export const useProductStore = create<ProductState>((set, get) => ({
   products: [],
   currentProduct: null,
+  totalPages: 1,
+  currentPage: 1,
   loading: false,
   success: null,
   error: null,
@@ -44,7 +48,13 @@ export const useProductStore = create<ProductState>((set, get) => ({
       set({ loading: true, error: null });
       try {
         const data = await fetchProducts(page, category, price);
-        set({ products: data.data, success: data.message, loading: false });
+        set({
+          products: data.data,
+          currentPage: data.currentPage,
+          totalPages: data.totalPages,
+          success: data.message,
+          loading: false,
+        });
       } catch (err) {
         set({ error: err.request.statusText, loading: false });
       }

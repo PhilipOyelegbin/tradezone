@@ -16,7 +16,7 @@ const Account: React.FC = () => {
   const { authUser, addUser, verifyUser } = useUserActions();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = {
       first_name,
@@ -27,9 +27,9 @@ const Account: React.FC = () => {
       password,
     };
     if (isLogin) {
-      authUser(formData);
+      await authUser(formData);
     } else {
-      addUser(formData);
+      await addUser(formData);
     }
   };
 

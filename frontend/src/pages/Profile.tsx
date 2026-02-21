@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useUserActions, useUserStore } from "../store/user.store";
-import { FiTrash, FiUser } from "react-icons/fi";
+import { FiLogOut, FiTrash, FiUser } from "react-icons/fi";
 import { useOrderStore } from "../store/order.store";
 import toast, { Toaster } from "react-hot-toast";
 import { Link } from "react-router-dom";
@@ -19,7 +19,7 @@ function Profile() {
     new_password: "",
     confirm_password: "",
   });
-  const { getUserById, updateUser } = useUserActions();
+  const { getUserById, updateUser, logout } = useUserActions();
   const { orders } = useOrderStore((state) => state);
   const { getOrders, deleteOrder } = useOrderStore((state) => state.actions);
 
@@ -87,11 +87,19 @@ function Profile() {
   return (
     <div className="min-h-screen bg-gray-100 px-6 md:px-14 py-16">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">My Account</h1>
-        <p className="text-sm text-gray-600">
-          Manage your profile, orders, and security settings
-        </p>
+      <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">My Account</h1>
+          <p className="text-sm text-gray-600">
+            Manage your profile, orders, and security settings
+          </p>
+        </div>
+        <button
+          onClick={() => logout()}
+          className="flex items-center gap-2 rounded-lg bg-[#E25822] px-4 py-2 text-sm font-medium text-white hover:bg-[#B84016]"
+        >
+          <FiLogOut /> Logout
+        </button>
       </div>
 
       {/* Contents */}
